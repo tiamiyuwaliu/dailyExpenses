@@ -110,7 +110,6 @@ class PlanController extends Controller
     }
 
     public function delete(Request $request, $id) {
-        if ($id == 1) return redirect()->route('plans');
         Plan::find($id)->delete();
         return redirect()->route('plans')->with('message', __('Plans deleted successfully'));
 
