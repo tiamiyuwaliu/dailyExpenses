@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('expenses', function(Blueprint $table) {
-            $table->id();
-            $table->integer('user_id');
-            $table->text('item');
-            $table->string('cost');
-            $table->integer('client_id')->nullable()->index('client_id');
-            $table->string('record_date');
+        Schema::table('expenses', function (Blueprint $table) {
+            $table->timestamps();
+        });
+        Schema::table('clients', function (Blueprint $table) {
+            $table->timestamps();
         });
     }
 
@@ -30,6 +28,8 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('expenses', function (Blueprint $table) {
+            //
+        });
     }
 };
