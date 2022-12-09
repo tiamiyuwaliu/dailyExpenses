@@ -1,64 +1,60 @@
-<script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/inertia-vue3';
-
-const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    terms: false,
-});
-
-const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
-};
-</script>
-
 <template>
     <GuestLayout>
-        <Head title="Register" />
+      <h2 class="mt-5 d-block font-weight-light">Create your account!</h2>
+      <p class="text-caption font-weight-light text-grey">Provide your name, email address and choose a password</p>
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="name" value="Name" />
-                <TextInput id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
-                <InputError class="mt-2" :message="form.errors.name" />
-            </div>
+      <div class="mt-13">
+        <v-text-field :label="__('Your name')" :error="!!formData.errors.name" :error-messages="formData.errors.name" v-model="formData.name" variant="solo"></v-text-field>
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
-                <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autocomplete="username" />
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+        <v-text-field :label="__('Email address')" :error="!!formData.errors.email" :error-messages="formData.errors.email" v-model="formData.email" variant="solo"></v-text-field>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-                <TextInput id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="new-password" />
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+        <v-text-field type="password" class="mt-2" :error="!!formData.errors.password" :error-messages="formData.errors.password" v-model="formData.password" :label="__('Password')" variant="solo"></v-text-field>
+        <v-text-field type="password" class="mt-2" :error="!!formData.errors.password_confirmation" :error-messages="formData.errors.password_confirmation" v-model="formData.password_confirmation" :label="__('Confirm password')" variant="solo"></v-text-field>
 
-            <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput id="password_confirmation" type="password" class="mt-1 block w-full" v-model="form.password_confirmation" required autocomplete="new-password" />
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
-            </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Already registered?
-                </Link>
+        <v-btn @click="login" :loading="loading" block color="primary" size="x-large" prepend-icon="mdi-lock" variant="flat">
+          {{__('Register')}}
+        </v-btn>
 
-                <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
-                </PrimaryButton>
-            </div>
-        </form>
+        <div class="mt-16 text-center text-body-2">
+          {{__("Already have an account yet?")}} <Link :href="route('login')">{{__('Log in')}}</Link>
+        </div>
+      </div>
+
     </GuestLayout>
 </template>
+<script >
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+import {Link, useForm, usePage} from '@inertiajs/inertia-vue3';
+import {useToast} from "vue-toastification";
+
+export default {
+  components: {GuestLayout, Link},
+  updated() {
+    this.loading = false;
+    if (usePage().props.value.flash.message) {
+      let toast = useToast();
+      toast.success(usePage().props.value.flash.message)
+    }
+  },
+  data() {
+    return {
+      loading: false,
+      formData: useForm({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: ''
+      })
+    };
+  },
+
+  methods: {
+    login() {
+      this.loading = true;
+      this.formData.post('/register');
+    }
+  }
+}
+</script>
+

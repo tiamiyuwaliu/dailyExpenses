@@ -59,12 +59,50 @@ class HandleInertiaRequests extends Middleware
             'locale' => App::currentLocale(),
             'config' => [
                 'site_title' => config('site-title', 'ProjectBase'),
-                'theme' => config('default-theme', 'light')
+                'theme' => config('default-theme', 'light'),
+                'lightLogo' => (config('site-light-logo')) ? storage_url(config('site-light-logo')) : asset('images/logo-light.png'),
+                'darkLogo' => (config('site-dark-logo')) ? storage_url(config('site-dark-logo')) : asset('images/logo-dark.png'),
+                'icon' => (config('site-favicon')) ? storage_url(config('site-favicon')) : asset('images/icon.png')
             ],
             'languages' => [
                 ['title' => __('English'), 'value' => 'en'],
                 ['title' => __('French'), 'value' => 'fr'],
                 ['title' => __('Arabic'), 'value' => 'ar'],
+            ],
+            'user_menu'  => [
+                [
+                    'title' => __('Menu'),
+                    'divider' => true,
+                    'menus' => [
+                        ['title' => __('Home'), 'link' => '/dashboard', 'icon' => 'mdi-home'],
+                        ['title' => __('Clients'), 'link' => '/clients', 'icon' => 'mdi-account-group-outline'],
+                        [
+                            'title' => __('Expenses'),
+                            'link' => '/expenses',
+                            'icon' => 'mdi-file-document-edit-outline',
+                            'sub' => [
+                                ['title' => __('Lists'), 'link' => '/expenses', 'icon' => 'mdi-text-box-outline'],
+                                ['title' => __('Add New'), 'link' => '/expenses/new', 'icon' => 'mdi-text-box-plus-outline'],
+
+                            ]
+                        ],
+                        [
+                            'title' => __('Reports'),
+                            'link' => '/reports',
+                            'icon' => 'mdi-finance',
+                            'sub' => [
+                                ['title' => __('Expenses'), 'link' => '/reports/expenses', 'icon' => 'mdi-file-chart-outline'],
+                            ]
+                        ],
+                    ]
+                ],
+                [
+                    'title' => __('Profile'),
+                    'divider' => false,
+                    'menus' => [
+                        ['title' => __('Profile'), 'link' => '/profile', 'icon' => 'mdi-account-circle-outline'],
+                    ]
+                ]
             ],
             'admin_menu' => [
                 [

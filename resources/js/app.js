@@ -22,6 +22,7 @@ const vuetify = createVuetify({
     }
 })
 import {translations} from "@/Mixins/translations";
+import {url} from "@/Mixins/url";
 
 const appName = window.document.getElementsByTagName('title')[0]?.getAttribute('name');
 
@@ -41,6 +42,7 @@ createInertiaApp({
             .component(CustomScrollbar.name, CustomScrollbar)
             .component('QuillEditor', QuillEditor)
             .mixin(translations)
+            .mixin(url)
             .mount(el);
     },
 });

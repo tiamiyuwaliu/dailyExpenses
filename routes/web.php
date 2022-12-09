@@ -16,12 +16,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return Inertia::render('Home');
 })->name('home');
 
 Route::get('/set/locale/{locale}', function (\Illuminate\Http\Request $request, $locale) {
@@ -30,12 +25,29 @@ Route::get('/set/locale/{locale}', function (\Illuminate\Http\Request $request, 
     return back();
 })->name('set-locale');
 
-Route::get('/dashboard', function () {
-    seo()->setTitle(__("Settings > General"));
-    return Inertia::render('Dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';
+Route::any('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::any('/clients', [\App\Http\Controllers\ClientController::class, 'index'])->middleware(['auth', 'verified'])->name('clients');
+Route::any('/clients/add', [\App\Http\Controllers\ClientController::class, 'add'])->middleware(['auth', 'verified'])->name('clients.add');
+Route::any('/clients/edit/{id}', [\App\Http\Controllers\ClientController::class, 'edit'])->middleware(['auth', 'verified'])->name('clients.edit')->where('id', '[0-9]+');;
+Route::any('/clients/delete/{id}', [\App\Http\Controllers\ClientController::class, 'delete'])->middleware(['auth', 'verified'])->name('clients.delete')->where('id', '[0-9]+');;
+Route::any('/clients/{id}', [\App\Http\Controllers\ClientController::class, 'view'])->middleware(['auth', 'verified'])->name('clients.view')->where('id', '[0-9]+');;
+
+Route::any('/expenses', [\App\Http\Controllers\ExpenseController::class, 'index'])->middleware(['auth', 'verified'])->name('expenses');
+Route::any('/expenses/add', [\App\Http\Controllers\ExpenseController::class, 'add'])->middleware(['auth', 'verified'])->name('expenses.add');
+Route::any('/expenses/edit/{id}', [\App\Http\Controllers\ExpenseController::class, 'edit'])->middleware(['auth', 'verified'])->name('expenses.edit');
+Route::any('/expenses/delete/{id}', [\App\Http\Controllers\ExpenseController::class, 'delete'])->middleware(['auth', 'verified'])->name('expenses.delete');
+Route::any('/expenses/duplicate/{id}', [\App\Http\Controllers\ExpenseController::class, 'duplicate'])->middleware(['auth', 'verified'])->name('expenses.duplicate');
+
+Route::any('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->middleware(['auth', 'verified'])->name('profile');
+Route::any('/profile/password', [\App\Http\Controllers\ProfileController::class, 'password'])->middleware(['auth', 'verified'])->name('profile.password');
+Route::any('/profile/business', [\App\Http\Controllers\ProfileController::class, 'business'])->middleware(['auth', 'verified'])->name('profile.business');
+Route::any('/profile/theme', [\App\Http\Controllers\ProfileController::class, 'theme'])->middleware(['auth', 'verified'])->name('profile.theme');
+
+Route::any('/report/expenses', [\App\Http\Controllers\ReportController::class, 'expenses'])->middleware(['auth', 'verified'])->name('report.expenses');
+
 
 Route::middleware(['auth', 'isAdmin'])->prefix('admin')->group(callback: function() {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminController::class, 'index']);

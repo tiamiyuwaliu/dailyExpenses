@@ -1,110 +1,184 @@
-<script setup>
+<script>
 import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/inertia-vue3';
+import {Link, usePage} from '@inertiajs/inertia-vue3';
+import {useTheme} from "vuetify";
+export default  {
+  components: {Link},
+  setup() {
+    const themeObj = useTheme()
+    var theme = usePage().props.value.config.theme;
+    if (localStorage.getItem('theme')) theme = localStorage.getItem('theme')
+    themeObj.global.name.value = theme;
+    return {
+      themeObj,
+    }
+  },
+  data() {
+    return {
+      logoLight: usePage().props.value.config.lightLogo,
+      darkLight: usePage().props.value.config.darkLogo,
+      theme: this.themeObj.global.name.value,
+      locale: usePage().props.value.locale,
+      languages: usePage().props.value.languages,
+      drawer: (window.innerWidth > 600) ,
+      rail: (localStorage.getItem('drawer') ? Boolean(Number(localStorage.getItem('drawer'))) : false),
+      user: usePage().props.value.auth.user,
+      avatar: usePage().props.value.auth.avatar,
+      open: [],
+      menus: usePage().props.value.user_menu,
+    }
+  },
 
-const showingNavigationDropdown = ref(false);
+  methods: {
+    toggleTheme: function() {
+      this.themeObj.global.name.value = this.themeObj.global.current.value.dark ? 'light' : 'dark'
+      this.theme = this.themeObj.global.name.value;
+      localStorage.setItem('theme', this.theme);
+    },
+    toggleDrawer: function() {
+      localStorage.setItem('drawer', this.rail ? '0' : '1');
+      this.rail = !this.rail;
+    },
+    openMenu: function() {
+      this.drawer = true;
+    },
+  }
+}
 </script>
 
 <template>
-    <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav class="bg-white border-b border-gray-100">
-                <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationLogo class="block h-9 w-auto" />
-                                </Link>
-                            </div>
+  <div id="dashboard-container" :class="theme === 'dark' ? 'dark-theme' : null ">
+      <div class="header clearfix">
+        <div class="float-left">
+          <v-btn prepend-icon="mdi-home" color="white" variant="flat">
+              {{__('Home')}}
+          </v-btn>
 
-                            <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
+          <v-btn prepend-icon="mdi-home" color="white" variant="plain">
+            {{__('Expenses')}}
+          </v-btn>
 
-                        <div class="hidden sm:flex sm:items-center sm:ml-6">
-                            <!-- Settings Dropdown -->
-                            <div class="ml-3 relative">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                                {{ $page.props.auth.user.name }}
-
-                                                <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
-                                        <DropdownLink :href="route('logout')" method="post" as="button">
-                                            Log Out
-                                        </DropdownLink>
-                                    </template>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-mr-2 flex items-center sm:hidden">
-                            <button @click="showingNavigationDropdown = ! showingNavigationDropdown" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                    <path :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
-                        <div class="px-4">
-                            <div class="font-medium text-base text-gray-800">{{ $page.props.auth.user.name }}</div>
-                            <div class="font-medium text-sm text-gray-500">{{ $page.props.auth.user.email }}</div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('logout')" method="post" as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
-
-            <!-- Page Content -->
-            <main>
-                <slot />
-            </main>
+          <v-btn prepend-icon="mdi-home" color="white" variant="plain">
+            {{__('Reports')}}
+          </v-btn>
         </div>
-    </div>
+        <div class="float-right">
+          <div class="d-flex flex-row">
+
+            <v-btn
+                variant="normal"
+                class="ml-2"
+                @click="toggleTheme"
+                icon="mdi-invert-colors"
+                :color="theme === 'dark' ? 'primary' : 'white'"
+            ></v-btn>
+
+            <a :href="route('logout')">
+              <v-btn
+                  variant="normal"
+                  class="ml-2"
+                  icon="mdi-location-exit"
+                  color="white"
+              ></v-btn>
+            </a>
+          </div>
+        </div>
+
+        <div class="add-button">
+          <v-menu :offset="[10,80]" width="200" offset-x="40">
+            <template v-slot:activator="{ props }">
+              <v-btn icon="mdi-plus" variant="flat" color="warning" v-bind="props"></v-btn>
+            </template>
+
+            <v-list density="compact">
+              <v-list-item @click="goTo(route('home'))" >
+                <v-list-item-title>{{ __('Add Client') }}</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="goTo(route('home'))">
+                <v-list-item-title>{{ __('Add Expense') }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </div>
+
+      </div>
+
+    <v-layout>
+      <v-navigation-drawer
+          v-model="drawer"
+          :rail="rail"
+          expand-on-hover
+          rail-width="70"
+          location="start"
+
+          class=""
+      >
+        <v-btn
+            class="navigation-toggle d-none d-md-block"
+            color="primary"
+            size="x-small"
+            icon="mdi-chevron-left"
+            @click="toggleDrawer"
+        ></v-btn>
+
+        <v-list-item
+            :prepend-avatar="avatar"
+            :title="user.name"
+            nav
+            class="ps-5 pe-3 pt-4 pb-4"
+        >
+        </v-list-item>
+
+        <custom-scrollbar direction="vertical" class="side-menu">
+
+          <div class="d-flex flex-column" style="min-height: calc(100vh - 150px);">
+            <v-list v-model:opened="open" class=" pl-0 pr-0 flex-grow-1" density="compact" nav>
+              <div v-for="menu in menus" :key="menu.title">
+
+
+                <div v-for="item in menu.menus" :key="item.title">
+                  <div v-if="item.sub !== undefined">
+                    <v-list-group :value="item.title" >
+                      <template v-slot:activator="{ props }">
+                        <v-list-item
+                            v-bind="props"
+                            :prepend-icon="item.icon"
+                            :title="item.title"
+                        ></v-list-item>
+                      </template>
+                      <div class="bg-grey-lighten-5">
+                        <Link v-for="itemSub in item.sub" :key="itemSub.title" :href="itemSub.link">
+                          <v-list-item class="rounded-0" :class="($page.url === itemSub.link) ? 'active': null"   :prepend-icon="itemSub.icon" :title="itemSub.title"></v-list-item>
+                        </Link>
+                      </div>
+                    </v-list-group>
+                  </div>
+                  <div v-else>
+                    <Link :href="item.link" class="grey">
+                      <v-list-item  class="rounded-0" :class="($page.url.search(item.link) === 0) ? 'active': null"  :prepend-icon="item.icon" :title="item.title"></v-list-item>
+                    </Link>
+                  </div>
+                </div>
+
+
+                <v-divider class="mt-3 mb-3 " v-if="menu.divider"></v-divider>
+              </div>
+            </v-list>
+            <div class="pa-6 text-center">
+              <img src="/images/help.png" class="w-75"/>
+              <h5 class="mb-2">{{__('Do you Need help?')}}</h5>
+              <v-btn>
+                {{__('Get help')}}
+              </v-btn>
+            </div>
+          </div>
+
+        </custom-scrollbar>
+      </v-navigation-drawer>
+      <v-main style="height: 100vh;" class="bg-grey-lighten-5">
+        <slot/>
+      </v-main>
+    </v-layout>
+      <slot/>
+  </div>
 </template>
