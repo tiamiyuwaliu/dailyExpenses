@@ -15,7 +15,6 @@ class ExpenseController extends Controller
         $expenses->getCollection()->transform(function($value) {
             $value->editUrl = route('expenses.edit', ['id' => $value->id]);
             $value->deleteUrl = route('expenses.delete', ['id' => $value->id]);
-            $value->viewUrl = route('expenses.view', ['id' => $value->id]);
             return $value;
         });
         return Inertia::render('Expenses/List', [

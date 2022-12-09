@@ -21,4 +21,8 @@ class Client extends Model
         'tax_name',
         'tax_number',
     ];
+
+    public function expenses() {
+        return $this->hasMany(Expense::class, 'client_id');
+    }
 }
