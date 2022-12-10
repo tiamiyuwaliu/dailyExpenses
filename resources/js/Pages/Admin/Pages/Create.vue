@@ -67,9 +67,6 @@ export default {
     },
 
     methods: {
-        setContent(d, o, s) {
-            console.log(d);
-        },
         submit() {
             this.loading = true;
             this.formData.post('/admin/pages/create');

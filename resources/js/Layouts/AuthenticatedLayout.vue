@@ -176,7 +176,9 @@ export default  {
         </custom-scrollbar>
       </v-navigation-drawer>
       <v-main style="height: 100vh;" class="bg-grey-lighten-5">
-        <slot/>
+        <v-container>
+          <slot/>
+        </v-container>
       </v-main>
     </v-layout>
       <slot/>
